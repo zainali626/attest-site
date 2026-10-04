@@ -8,7 +8,7 @@
     <!-- Empty inline icon: stops the browser fetching /favicon.ico, which
          lives outside the artifact's routes and 404s. -->
     <link rel="icon" href="data:," />
-    <title>SOC 2 Readiness Assessment — Attest</title>
+    <title>SOC 2 Readiness Assessment — Attrestry</title>
     <style>
       :root {
         --bg: #0a0a0b;
@@ -464,7 +464,7 @@
           <span class="mk" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.5 6 11 11.5 3.5" stroke="#0a0a0b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
-          Attest
+          Attrestry
         </a>
         <h1>SOC 2 Readiness Assessment</h1>
         <p class="lede">
@@ -472,7 +472,7 @@
           Answer honestly — you'll get a score for each criterion, a gap analysis,
           and a 90-day action plan.
         </p>
-        <p class="byline">A free tool from <strong>Attest</strong> — continuous SOC&nbsp;2 monitoring with an AI-agent audit trail.</p>
+        <p class="byline">A free tool from <strong>Attrestry</strong> — continuous SOC&nbsp;2 monitoring with an AI-agent audit trail.</p>
         <p class="scoring-inline">
           Open scoring, no hidden weights: <strong>Yes = 100 &middot; Partial = 50 &middot; Unsure = 25 &middot; No = 0.</strong>
           Each category score is the average of its question scores, rounded; the overall score
@@ -576,10 +576,10 @@
           </section>
 
           <section class="email-card" aria-labelledby="email-heading">
-            <h3 id="email-heading">Get early access to Attest</h3>
+            <h3 id="email-heading">Get early access to Attrestry</h3>
             <p class="email-blurb">
               Turn this one-time assessment into a live system: continuous SOC&nbsp;2 control monitoring
-              with an AI-agent audit trail. Leave your email and we'll invite you when Attest opens for sign-ups.
+              with an AI-agent audit trail. Leave your email and we'll invite you when Attrestry opens for sign-ups.
             </p>
             <form id="email-form" novalidate>
               <div id="email-fields">
@@ -593,11 +593,11 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                   <span id="email-error-text"></span>
                 </p>
-                <p class="stub-note">Demo build: your email is stored in this browser only, until this form is connected to Attest's backend.</p>
+                <p class="stub-note">Demo build: your email is stored in this browser only, until this form is connected to Attrestry's backend.</p>
               </div>
               <div class="success-box" id="email-success" role="status" hidden>
                 <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                <span>You're on the early-access list — we'll email you when Attest opens for sign-ups.</span>
+                <span>You're on the early-access list — we'll email you when Attrestry opens for sign-ups.</span>
               </div>
             </form>
           </section>
@@ -615,12 +615,12 @@
 
       <footer class="page-foot no-print">
         <p>Preliminary assessment — not a certification or audit. Only licensed CPA firms can issue SOC&nbsp;2 reports.</p>
-        <p>Attest — continuous compliance monitoring + AI-agent audit trail for startups.</p>
+        <p>Attrestry — continuous compliance monitoring + AI-agent audit trail for startups.</p>
       </footer>
     </div>
     <script>
     /* ================================================================
-       Attest — SOC 2 Readiness Assessment
+       Attrestry — SOC 2 Readiness Assessment
        Single-file static app. No network calls anywhere: every score,
        gap, and plan is computed in this browser from the user's answers.
        ================================================================ */
@@ -1043,7 +1043,7 @@
       var sourceLine = state.sample
         ? "Based on SAMPLE DATA (fictional 12-person SaaS startup), not the reader's answers."
         : "Based on the reader's answers.";
-      var html = '<p class="ps-meta">Attest SOC 2 Readiness Assessment</p>';
+      var html = '<p class="ps-meta">Attrestry SOC 2 Readiness Assessment</p>';
       if (state.sample) html += '<span class="ps-badge">Sample data</span>';
       html += "<h1>Executive Summary</h1>" +
         '<p class="ps-meta">' + date + " · " + sourceLine + "</p>" +
@@ -1086,7 +1086,7 @@
 
     /* ---------- Early-access email capture ----------
        Backend endpoint for lead capture. Empty string = same origin.
-       When the assessment is hosted on GitHub Pages and the Attest backend
+       When the assessment is hosted on GitHub Pages and the Attrestry backend
        runs elsewhere, set this to the backend's public URL, e.g.
        "https://attest.example.com". If the backend is unreachable, the lead
        is queued in localStorage on this device instead of being lost. */
@@ -1118,7 +1118,7 @@
         }
       });
 
-      // Lead capture: POST to the Attest backend; queue locally if unreachable.
+      // Lead capture: POST to the Attrestry backend; queue locally if unreachable.
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         var email = input.value.trim();
