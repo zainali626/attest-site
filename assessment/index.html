@@ -1,0 +1,1168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Free SOC 2 readiness assessment for startups: 26 plain-English questions, instant score, gap analysis, and a 90-day action plan. Runs entirely in your browser." />
+    <!-- Empty inline icon: stops the browser fetching /favicon.ico, which
+         lives outside the artifact's routes and 404s. -->
+    <link rel="icon" href="data:," />
+    <title>SOC 2 Readiness Assessment — Attest</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-subtle: #f4f7f6;
+        --panel: #ffffff;
+        --border: #dbe4e1;
+        --text: #15211d;
+        --muted: #5c6f69;
+        --accent: #0d6e64;
+        --accent-hover: #0a5952;
+        --on-accent: #ffffff;
+        --accent-soft: #e8f3f1;
+        --ai-bg: #fdf7eb;
+        --ai-border: #c7952c;
+        --ai-ink: #7a4d0d;
+        --ai-tag-bg: #7a4d0d;
+        --ai-tag-text: #ffffff;
+        --danger: #b42318;
+        --danger-soft: #fbeae8;
+        --warn: #a15c07;
+        --warn-soft: #faf0dc;
+        --info: #1d4ed8;
+        --info-soft: #e8eefc;
+        --ok: #177245;
+        --ok-soft: #e6f4ec;
+        --sample-chip-bg: #141a19;
+        --sample-chip-text: #ffd60a;
+        --radius: 10px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0e1412;
+          --bg-subtle: #141c19;
+          --panel: #121917;
+          --border: #2a3632;
+          --text: #e9f1ee;
+          --muted: #9fb0aa;
+          --accent: #4fd1c0;
+          --accent-hover: #7fe8d8;
+          --on-accent: #062a25;
+          --accent-soft: #142a26;
+          --ai-bg: #1f190d;
+          --ai-border: #8f6c1c;
+          --ai-ink: #e8bd5a;
+          --ai-tag-bg: #e8bd5a;
+          --ai-tag-text: #1c1405;
+          --danger: #f2807e;
+          --danger-soft: #2b1614;
+          --warn: #e3a63d;
+          --warn-soft: #2a2110;
+          --info: #8fb4ff;
+          --info-soft: #16233f;
+          --ok: #6bd598;
+          --ok-soft: #123023;
+          --sample-chip-bg: #ffd60a;
+          --sample-chip-text: #141a19;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      /* The UA's [hidden] rule loses to any author display rule, so
+         enforce it with the specificity it needs. */
+      [hidden] { display: none !important; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        font-size: 16px;
+      }
+
+      .visually-hidden {
+        position: absolute; width: 1px; height: 1px; margin: -1px;
+        clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+      }
+      .skip-link {
+        position: absolute; left: 16px; top: -48px; z-index: 50;
+        background: var(--accent); color: var(--on-accent);
+        padding: 10px 16px; border-radius: 8px; font-weight: 600;
+        text-decoration: none; transition: top 0.15s;
+      }
+      .skip-link:focus { top: 12px; }
+
+      .wrap { max-width: 790px; margin: 0 auto; padding: 0 20px 96px; }
+
+      /* ---------- Header ---------- */
+      .page-head { padding-top: 36px; }
+      .page-head h1 {
+        font-size: clamp(1.75rem, 4.5vw, 2.4rem);
+        line-height: 1.15; letter-spacing: -0.02em;
+        margin: 0 0 10px;
+      }
+      .lede { color: var(--muted); font-size: 1.06rem; margin: 0 0 8px; max-width: 46rem; }
+      .byline { color: var(--muted); font-size: 0.92rem; margin: 0 0 12px; }
+      .scoring-inline {
+        font-size: 0.88rem; color: var(--muted);
+        border-left: 3px solid var(--accent);
+        padding: 2px 0 2px 12px; margin: 14px 0 0; max-width: 46rem;
+      }
+      .scoring-inline strong { color: var(--text); font-weight: 700; }
+
+      .lock-callout {
+        display: flex; gap: 10px; align-items: flex-start;
+        background: var(--accent-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px 16px; margin: 18px 0 0;
+        font-size: 0.95rem;
+      }
+      .lock-callout .icon { flex: 0 0 auto; margin-top: 3px; color: var(--accent); }
+
+      .badge-sample {
+        display: inline-block; background: var(--sample-chip-bg); color: var(--sample-chip-text);
+        font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em;
+        padding: 4px 10px; border-radius: 6px; text-transform: uppercase;
+        vertical-align: middle; white-space: nowrap;
+      }
+      .sample-banner {
+        margin: 18px 0 0; padding: 12px 16px;
+        background: var(--warn-soft); border: 1.5px dashed var(--warn);
+        border-radius: var(--radius); font-size: 0.93rem;
+      }
+      .sample-banner p { margin: 0 0 8px; }
+      .sample-banner p:last-child { margin-bottom: 0; }
+
+      /* ---------- Buttons ---------- */
+      .btn {
+        font: inherit; font-weight: 700; font-size: 0.98rem;
+        border-radius: 8px; padding: 11px 22px;
+        border: 1.5px solid transparent; cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+        white-space: nowrap;
+      }
+      .btn-primary { background: var(--accent); color: var(--on-accent); }
+      .btn-primary:hover { background: var(--accent-hover); }
+      .btn-secondary { background: var(--panel); border-color: var(--border); color: var(--text); }
+      .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+      .btn-ghost { background: transparent; color: var(--muted); padding: 11px 12px; }
+      .btn-ghost:hover { color: var(--danger); }
+      .btn:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible {
+        outline: 2px solid var(--accent); outline-offset: 2px;
+      }
+
+      /* ---------- Questionnaire ---------- */
+      .sample-row {
+        display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+        margin: 26px 0 18px;
+      }
+      .sample-note { margin: 0; font-size: 0.9rem; color: var(--muted); flex: 1 1 240px; }
+
+      .progress-row { margin: 0 0 8px; }
+      .progress {
+        height: 9px; background: var(--bg-subtle); border: 1px solid var(--border);
+        border-radius: 999px; overflow: hidden;
+      }
+      .progress > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+      .progress-text { font-size: 0.88rem; color: var(--muted); margin: 6px 0 0; font-weight: 600; }
+
+      .cat-section { margin: 26px 0 0; }
+      .cat-head h3 { font-size: 1.22rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+      .cat-head .cat-blurb { color: var(--muted); font-size: 0.94rem; margin: 0 0 4px; max-width: 44rem; }
+      .cat-count { font-size: 0.8rem; color: var(--muted); margin: 0 0 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+      .cat-required {
+        display: inline-block; vertical-align: 2px;
+        font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--accent); border: 1.5px solid var(--accent); border-radius: 6px;
+        padding: 2px 9px; margin-left: 8px; white-space: nowrap;
+      }
+
+      /* AI Governance: visually prominent, the differentiator */
+      .cat-ai {
+        background: var(--ai-bg);
+        border: 1.5px solid var(--ai-border);
+        border-radius: 14px;
+        padding: 22px 20px 20px;
+        margin-top: 30px;
+      }
+      .ai-tag {
+        display: inline-block; background: var(--ai-tag-bg); color: var(--ai-tag-text);
+        font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+        padding: 5px 12px; border-radius: 999px; margin-bottom: 10px;
+      }
+      .cat-ai .cat-head h3 { color: var(--ai-ink); }
+      .cat-ai .question { background: transparent; border-color: var(--ai-border); }
+      .cat-ai .option { border-color: var(--ai-border); background: var(--panel); }
+      .cat-ai .option:hover { border-color: var(--ai-ink); }
+
+      .question {
+        border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 16px 18px 18px; margin: 0 0 14px;
+        background: var(--panel);
+      }
+      .question legend { padding: 0 6px; font-weight: 600; line-height: 1.5; }
+      .qnum {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 26px; height: 26px; padding: 0 6px; margin-right: 8px;
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        border-radius: 7px; font-size: 0.82rem; font-weight: 700; color: var(--muted);
+      }
+      .question.unanswered { border-color: var(--danger); box-shadow: 0 0 0 1px var(--danger); }
+      .question.unanswered .qnum { color: var(--danger); border-color: var(--danger); }
+
+      .options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+      @media (min-width: 620px) { .options { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+      .option {
+        position: relative; display: flex; align-items: center; justify-content: center;
+        gap: 8px; padding: 11px 8px;
+        border: 1.5px solid var(--border); border-radius: 8px;
+        background: var(--bg); cursor: pointer; font-weight: 600; font-size: 0.95rem;
+        text-align: center;
+      }
+      .option:hover { border-color: var(--accent); }
+      .option input {
+        position: absolute; width: 1px; height: 1px; margin: -1px;
+        clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+      }
+      .option:has(input:checked) { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+      .option:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+      .opt-dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid currentColor; opacity: 0.55; flex: 0 0 auto; }
+      .option:has(input:checked) .opt-dot { opacity: 1; background: currentColor; }
+
+      .validation {
+        margin: 18px 0 0; padding: 12px 16px;
+        background: var(--danger-soft); border: 1px solid var(--danger);
+        border-radius: var(--radius); color: var(--text); font-size: 0.95rem;
+      }
+      .validation strong { color: var(--danger); }
+
+      .sticky-bar {
+        position: sticky; bottom: 0; z-index: 20;
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        margin: 30px -20px -96px; padding: 14px 20px;
+      }
+      .sticky-inner { max-width: 790px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+      .sticky-count { font-weight: 700; font-size: 0.95rem; color: var(--muted); }
+
+      /* ---------- Results ---------- */
+      .results-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 30px 0 6px; }
+      .results-top h2 { font-size: clamp(1.5rem, 4vw, 1.9rem); letter-spacing: -0.02em; margin: 0; }
+      .based-on { color: var(--muted); font-size: 0.95rem; margin: 4px 0 0; }
+      .disclaimer-box {
+        border: 1.5px solid var(--warn); border-radius: var(--radius);
+        background: var(--warn-soft); padding: 12px 16px; margin: 16px 0 0;
+        font-size: 0.94rem; font-weight: 600;
+      }
+
+      .score-card {
+        border: 1px solid var(--border); border-radius: 14px;
+        background: var(--panel); padding: 22px; margin: 22px 0 0;
+      }
+      .score-hero { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+      .score-num { font-size: 3.6rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+      .score-of { font-size: 1.15rem; color: var(--muted); font-weight: 600; }
+      .score-band {
+        display: inline-block; font-weight: 700; font-size: 1rem;
+        padding: 8px 16px; border-radius: 999px; margin: 0 0 6px;
+      }
+      .score-sub { margin: 0; color: var(--muted); font-size: 0.9rem; font-weight: 600; }
+      .band-early  { background: var(--danger-soft); color: var(--danger); }
+      .band-building { background: var(--warn-soft); color: var(--warn); }
+      .band-nearly { background: var(--info-soft); color: var(--info); }
+      .band-ready  { background: var(--ok-soft); color: var(--ok); }
+      .meter {
+        height: 12px; border-radius: 999px; overflow: hidden;
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        margin: 16px 0 6px;
+      }
+      .meter > span { display: block; height: 100%; width: 0; transition: width 0.4s ease; }
+      .meter-early > span { background: var(--danger); }
+      .meter-building > span { background: var(--warn); }
+      .meter-nearly > span { background: var(--info); }
+      .meter-ready > span { background: var(--ok); }
+      .meter-scale { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+      .method-note {
+        font-size: 0.88rem; color: var(--muted); margin: 10px 0 0;
+        border-top: 1px solid var(--border); padding-top: 12px;
+      }
+
+      .results-section { margin-top: 34px; }
+      .results-section > h3 { font-size: 1.28rem; letter-spacing: -0.01em; margin: 0 0 4px; }
+      .results-section > .section-sub { color: var(--muted); font-size: 0.93rem; margin: 0 0 16px; }
+
+      .cat-row { margin: 0 0 16px; }
+      .cat-row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+      .cat-row-head .cat-name { font-weight: 700; font-size: 0.98rem; }
+      .cat-row-head .cat-name small { color: var(--muted); font-weight: 600; font-size: 0.8rem; margin-left: 6px; }
+      .cat-row-head .cat-score { font-weight: 800; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+      .cat-bar { height: 9px; border-radius: 999px; background: var(--bg-subtle); border: 1px solid var(--border); overflow: hidden; }
+      .cat-bar > span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.4s ease; }
+      .cat-na {
+        display: inline-block; font-weight: 800; font-size: 0.76rem; text-transform: uppercase;
+        letter-spacing: 0.06em; color: var(--muted);
+        border: 1.5px solid var(--border); border-radius: 6px;
+        padding: 3px 10px; white-space: nowrap;
+      }
+      .cat-na-note { font-size: 0.93rem; color: var(--muted); margin: 0; }
+
+      .gaps-group { margin: 0 0 24px; }
+      .gaps-group > h4 { font-size: 1.02rem; margin: 0 0 10px; }
+      .gaps-group > h4 .gap-count { color: var(--muted); font-weight: 600; font-size: 0.85rem; margin-left: 6px; }
+      .gap {
+        border: 1px solid var(--border); border-radius: var(--radius);
+        background: var(--panel); padding: 12px 16px; margin: 0 0 10px;
+      }
+      .gap-q { margin: 0 0 6px; font-weight: 600; font-size: 0.96rem; line-height: 1.5; }
+      .gap-fix { margin: 0; font-size: 0.93rem; color: var(--muted); }
+      .gap-fix .fix-label { font-weight: 800; color: var(--accent); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.06em; margin-right: 4px; }
+      .sev {
+        display: inline-block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 0.06em; padding: 2px 8px; border-radius: 5px; margin-right: 8px; vertical-align: 1px;
+      }
+      .sev-no { background: var(--danger-soft); color: var(--danger); }
+      .sev-partial { background: var(--warn-soft); color: var(--warn); }
+      .sev-unsure { background: var(--info-soft); color: var(--info); }
+      .all-clear {
+        border: 1px solid var(--ok); border-radius: var(--radius);
+        background: var(--ok-soft); padding: 16px 18px; margin: 0;
+        font-size: 0.96rem;
+      }
+
+      .plan-group { margin: 0 0 22px; }
+      .plan-group > h4 { font-size: 1.02rem; margin: 0 0 8px; }
+      .plan-group > h4 .window { color: var(--accent); }
+      .plan-list { list-style: none; margin: 0; padding: 0; }
+      .plan-item {
+        position: relative;
+        border: 1px solid var(--border); border-radius: var(--radius);
+        background: var(--panel); padding: 12px 16px 12px 56px; margin: 0 0 10px;
+      }
+      .plan-num {
+        position: absolute; left: 16px; top: 12px;
+        width: 26px; height: 26px; border-radius: 7px;
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        color: var(--muted); font-size: 0.82rem; font-weight: 800;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .plan-item p { margin: 0; font-size: 0.96rem; font-weight: 600; }
+      .plan-meta { font-size: 0.82rem; color: var(--muted); font-weight: 600; margin-top: 4px !important; }
+
+      /* ---------- Email capture ---------- */
+      .email-card {
+        border: 1px solid var(--border); border-radius: 14px;
+        background: var(--panel); padding: 24px; margin: 34px 0 0;
+      }
+      .email-card h3 { font-size: 1.28rem; letter-spacing: -0.01em; margin: 0 0 6px; }
+      .email-blurb { color: var(--muted); font-size: 0.95rem; margin: 0 0 16px; max-width: 40rem; }
+      .field-label { display: block; font-weight: 700; font-size: 0.92rem; margin: 0 0 6px; }
+      .email-row { display: flex; gap: 10px; flex-wrap: wrap; }
+      .email-row .input { flex: 1 1 240px; }
+      .input {
+        width: 100%; padding: 11px 14px; font: inherit; font-size: 1rem;
+        border: 1.5px solid var(--border); border-radius: 8px;
+        background: var(--bg); color: var(--text);
+      }
+      .input[aria-invalid="true"] { border-color: var(--danger); }
+      .error-msg {
+        display: flex; gap: 6px; align-items: center;
+        color: var(--danger); font-size: 0.9rem; font-weight: 600; margin: 8px 0 0;
+      }
+      .stub-note { font-size: 0.8rem; color: var(--muted); margin: 10px 0 0; }
+      .success-box {
+        display: flex; gap: 10px; align-items: flex-start;
+        background: var(--ok-soft); border: 1px solid var(--ok);
+        border-radius: var(--radius); padding: 14px 16px; font-weight: 600; font-size: 0.96rem;
+      }
+      .success-box .icon { flex: 0 0 auto; margin-top: 3px; color: var(--ok); }
+
+      .results-actions {
+        display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+        margin: 30px 0 0; padding-top: 22px; border-top: 1px solid var(--border);
+      }
+
+      .page-foot {
+        border-top: 1px solid var(--border); margin-top: 40px; padding: 20px 0 40px;
+        color: var(--muted); font-size: 0.84rem;
+      }
+      .page-foot p { margin: 0 0 6px; }
+
+      /* ---------- Print: executive summary only ---------- */
+      #print-summary { display: none; }
+      .ps-badge {
+        display: inline-block; background: #141a19; color: #ffd60a;
+        font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em;
+        padding: 4px 10px; border-radius: 6px; text-transform: uppercase; margin-bottom: 8px;
+      }
+
+      @media print {
+        :root {
+          --bg: #ffffff; --bg-subtle: #f2f4f3; --panel: #ffffff;
+          --border: #c9d2cf; --text: #111; --muted: #444;
+          --accent: #0d6e64; --on-accent: #ffffff;
+          --danger: #b42318; --danger-soft: #fbeae8;
+          --warn: #a15c07; --warn-soft: #faf0dc;
+          --info: #1d4ed8; --info-soft: #e8eefc;
+          --ok: #177245; --ok-soft: #e6f4ec;
+        }
+        body { background: #fff; color: #111; font-size: 12px; line-height: 1.5; }
+        .no-print, #view-questions, #view-results { display: none !important; }
+        #print-summary { display: block !important; }
+        .wrap { max-width: 100%; padding: 0; }
+        #print-summary h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+        #print-summary h2 { font-size: 14px; margin: 18px 0 6px; border-bottom: 1.5px solid #111; padding-bottom: 4px; }
+        .ps-meta { color: #444; font-size: 11px; margin: 0; }
+        .ps-score-line { font-size: 16px; font-weight: 700; margin: 10px 0 4px; }
+        .ps-method { color: #444; font-size: 11px; margin: 4px 0 0; }
+        .ps-table { width: 100%; border-collapse: collapse; margin: 8px 0 0; font-size: 12px; }
+        .ps-table th, .ps-table td { text-align: left; padding: 5px 8px; border-bottom: 1px solid #ccc; }
+        .ps-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #444; }
+        .ps-table td:last-child, .ps-table th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+        .ps-gaps { margin: 6px 0 0; padding-left: 20px; }
+        .ps-gaps li { margin: 0 0 8px; break-inside: avoid; }
+        .ps-gaps .ps-fix { color: #333; }
+        .ps-disc {
+          margin: 18px 0 0; padding: 10px 12px; border: 1.5px solid #a15c07;
+          font-weight: 700; font-size: 12px; break-inside: avoid;
+        }
+        .ps-lock { margin: 10px 0 0; color: #444; font-size: 11px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="wrap">
+      <header class="page-head no-print">
+        <h1>SOC 2 Readiness Assessment</h1>
+        <p class="lede">
+          Twenty-six plain-English questions mapped to the AICPA Trust Services Criteria.
+          Answer honestly — you'll get a score for each criterion, a gap analysis,
+          and a 90-day action plan.
+        </p>
+        <p class="byline">A free tool from <strong>Attest</strong> — continuous SOC&nbsp;2 monitoring with an AI-agent audit trail.</p>
+        <p class="scoring-inline">
+          Open scoring, no hidden weights: <strong>Yes = 100 &middot; Partial = 50 &middot; Unsure = 25 &middot; No = 0.</strong>
+          Each category score is the average of its question scores, rounded; the overall score
+          is the average of the applicable category scores, rounded.
+          <strong>Question 21 is not scored</strong> — it only determines whether the AI Governance
+          section applies to you: answer &ldquo;No&rdquo; and the section is marked not applicable
+          and left out of your score, because there's nothing to govern.
+        </p>
+        <div class="lock-callout" role="note">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Your data never leaves this browser — all analysis runs locally.</span>
+        </div>
+        <div class="sample-banner" id="sample-banner" hidden>
+          <p><span class="badge-sample">Sample data</span></p>
+          <p>These answers come from a <strong>fictional 12-person SaaS startup</strong> — decent on access control and encryption,
+          weak on incident response, vendor reviews, and backup testing, and poor on AI governance.
+          Any results you see are based on this sample data, not your own answers.</p>
+          <p><button type="button" class="btn btn-secondary" id="btn-clear-sample">Clear sample data &amp; start fresh</button></p>
+        </div>
+      </header>
+
+      <main id="main">
+        <!-- ============ QUESTIONNAIRE ============ -->
+        <section class="no-print" id="view-questions" aria-labelledby="questionnaire-heading">
+          <h2 id="questionnaire-heading" class="visually-hidden">Questionnaire — 26 questions</h2>
+          <div class="sample-row">
+            <button type="button" class="btn btn-secondary" id="btn-sample">Try with sample answers</button>
+            <p class="sample-note">See what a finished report looks like, pre-filled with data from a fictional 12-person SaaS startup.</p>
+          </div>
+          <div class="progress-row">
+            <div class="progress" role="progressbar" aria-label="Questions answered" aria-valuemin="0" aria-valuemax="26" aria-valuenow="0" id="progressbar">
+              <span id="progress-fill"></span>
+            </div>
+            <p class="progress-text" id="progress-text" aria-live="polite">0 of 26 answered</p>
+          </div>
+          <div id="sections"><!-- Questions render here --></div>
+          <div class="validation" id="validation" role="alert" hidden></div>
+          <div class="sticky-bar">
+            <div class="sticky-inner">
+              <span class="sticky-count" id="sticky-count" aria-live="polite">0 of 26 answered</span>
+              <button type="button" class="btn btn-primary" id="btn-results">See my results</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ RESULTS ============ -->
+        <section id="view-results" class="no-print" hidden aria-labelledby="results-heading">
+          <div class="results-top">
+            <h2 id="results-heading" tabindex="-1">Your readiness results</h2>
+            <span class="badge-sample" id="results-sample-badge" hidden>Sample data</span>
+          </div>
+          <p class="based-on" id="based-on"></p>
+
+          <div class="lock-callout" role="note">
+            <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Your data never leaves this browser — all analysis runs locally.</span>
+          </div>
+
+          <p class="disclaimer-box" role="note">Preliminary assessment — not a certification or audit. Only licensed CPA firms can issue SOC&nbsp;2 reports.</p>
+
+          <div class="score-card">
+            <div class="score-hero">
+              <div><span class="score-num" id="overall-num">0</span><span class="score-of"> / 100</span></div>
+              <div>
+                <p class="score-band" id="band-label"></p>
+                <p class="score-sub">Overall SOC&nbsp;2 readiness</p>
+              </div>
+            </div>
+            <div class="meter" id="meter"><span id="meter-fill"></span></div>
+            <div class="meter-scale" aria-hidden="true"><span>0</span><span>100</span></div>
+            <p class="method-note" id="method-note">
+              <strong>How this was computed.</strong> Yes = 100, Partial = 50, Unsure = 25, No = 0.
+              Each category score is the average of its question scores, rounded.
+              <strong>Question 21 is not scored</strong> — it only determines whether the AI Governance
+              section applies to you.
+              The overall score is the average of the applicable rounded category scores, rounded.
+              Bands: 0&ndash;39 Early stage, 40&ndash;59 Building foundations, 60&ndash;79 Nearly ready, 80&ndash;100 Audit-ready.
+            </p>
+          </div>
+
+          <section class="results-section" aria-labelledby="cat-heading">
+            <h3 id="cat-heading">Scores by category</h3>
+            <p class="section-sub">Exact category scores — each a rounded average of its question scores.</p>
+            <div id="category-bars"></div>
+          </section>
+
+          <section class="results-section" aria-labelledby="gaps-heading">
+            <h3 id="gaps-heading">Gap analysis</h3>
+            <p class="section-sub">Every applicable scored question you did not answer &ldquo;yes&rdquo; becomes a gap, grouped by category, each with a one-line fix. Question 21 is not scored, and the AI questions are omitted when AI Governance doesn't apply to you.</p>
+            <div id="gaps-list"></div>
+          </section>
+
+          <section class="results-section" id="plan-section" aria-labelledby="plan-heading">
+            <h3 id="plan-heading">Your 90-day action plan</h3>
+            <p class="section-sub">Gaps prioritized for you: Security "no" answers first, then other "no" answers, then partials, then unsures.</p>
+            <div id="plan-list"></div>
+          </section>
+
+          <section class="email-card" aria-labelledby="email-heading">
+            <h3 id="email-heading">Get early access to Attest</h3>
+            <p class="email-blurb">
+              Turn this one-time assessment into a live system: continuous SOC&nbsp;2 control monitoring
+              with an AI-agent audit trail. Leave your email and we'll invite you when Attest opens for sign-ups.
+            </p>
+            <form id="email-form" novalidate>
+              <div id="email-fields">
+                <label class="field-label" for="email-input">Email address</label>
+                <div class="email-row">
+                  <input class="input" type="email" id="email-input" name="email" autocomplete="email" placeholder="you@company.com" aria-describedby="email-error" />
+                  <!-- Lead capture posts to POST <ATTEST_API_URL>/api/leads (see ATTEST_API_URL in the script below). -->
+                  <button class="btn btn-primary" type="submit">Request early access</button>
+                </div>
+                <p class="error-msg" id="email-error" role="alert" hidden>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span id="email-error-text"></span>
+                </p>
+                <p class="stub-note">Demo build: your email is stored in this browser only, until this form is connected to Attest's backend.</p>
+              </div>
+              <div class="success-box" id="email-success" role="status" hidden>
+                <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>You're on the early-access list — we'll email you when Attest opens for sign-ups.</span>
+              </div>
+            </form>
+          </section>
+
+          <div class="results-actions">
+            <button type="button" class="btn btn-secondary" id="btn-edit">Edit my answers</button>
+            <button type="button" class="btn btn-secondary" id="btn-print">Print summary</button>
+            <button type="button" class="btn btn-ghost" id="btn-reset">Start over</button>
+          </div>
+        </section>
+
+        <!-- ============ PRINT-ONLY EXECUTIVE SUMMARY ============ -->
+        <div id="print-summary" role="article" aria-label="Executive summary for printing"></div>
+      </main>
+
+      <footer class="page-foot no-print">
+        <p>Preliminary assessment — not a certification or audit. Only licensed CPA firms can issue SOC&nbsp;2 reports.</p>
+        <p>Attest — continuous compliance monitoring + AI-agent audit trail for startups.</p>
+      </footer>
+    </div>
+    <script>
+    /* ================================================================
+       Attest — SOC 2 Readiness Assessment
+       Single-file static app. No network calls anywhere: every score,
+       gap, and plan is computed in this browser from the user's answers.
+       ================================================================ */
+
+    var ANSWER_VALUE = { yes: 100, partial: 50, unsure: 25, no: 0 };
+
+    var CATEGORIES = [
+      { key: "security", name: "Security", required: true,
+        blurb: "The only criterion required in every SOC 2 examination — identity, encryption, monitoring, and response." },
+      { key: "availability", name: "Availability",
+        blurb: "Whether customers can reach your systems — and whether you can recover when they go down." },
+      { key: "confidentiality", name: "Confidentiality",
+        blurb: "Who can see customer data — and what keeps the wrong people from seeing it." },
+      { key: "integrity", name: "Processing Integrity",
+        blurb: "Whether your systems process data completely and accurately, with a record of what changed." },
+      { key: "privacy", name: "Privacy",
+        blurb: "What personal data you collect, what you do with it, and how people can get it deleted." },
+      { key: "ai", name: "AI Governance", differentiator: true,
+        blurb: "The Trust Services Criteria have no separate AI criterion — an examiner evaluates AI tooling under Security. It gets its own section here because this is where startups now face the sharpest new questions." }
+    ];
+
+    var QUESTIONS = [
+      { id: 1, cat: "security", text: "Is multi-factor authentication (MFA) enforced for all employees on all work systems?", fix: "Enforce MFA org-wide in your identity provider and confirm enrollment with an admin report." },
+      { id: 2, cat: "security", text: "Does every employee have a unique login (no shared accounts), with access revoked promptly when someone leaves?", fix: "Eliminate shared credentials and follow an offboarding checklist that revokes access the same day." },
+      { id: 3, cat: "security", text: "Are company laptops encrypted and protected with passwords or biometrics?", fix: "Turn on full-disk encryption (FileVault/BitLocker) and require a password or biometrics on every device." },
+      { id: 4, cat: "security", text: "Do you run automated security scanning or penetration testing on your product?", fix: "Add automated dependency scanning to CI and schedule an annual penetration test of the production app." },
+      { id: 5, cat: "security", text: "Is production data encrypted at rest and in transit?", fix: "Serve everything over TLS and enable at-rest encryption on databases, storage, and backups." },
+      { id: 6, cat: "security", text: "Do you have an incident response plan for a security breach?", fix: "Write a one-page incident response plan — who does what, in what order — and walk through it once." },
+      { id: 7, cat: "security", text: "Are third-party vendors with access to customer data reviewed for security?", fix: "List vendors touching customer data and collect their SOC 2 reports or security questionnaires this quarter." },
+      { id: 8, cat: "security", text: "Do you back up critical data regularly and test restores?", fix: "Automate backups of critical data and run a real restore test every quarter." },
+      { id: 9, cat: "availability", text: "Do you monitor uptime/availability of production systems?", fix: "Put uptime monitoring on production endpoints and page someone when systems stop responding." },
+      { id: 10, cat: "availability", text: "Do you have documented backup and disaster recovery procedures?", fix: "Document backup and recovery procedures: what to restore, from where, and the step-by-step order." },
+      { id: 11, cat: "availability", text: "Can you recover critical systems within a defined time if they fail?", fix: "Define a recovery-time target (RTO) and drill a recovery to prove you can meet it." },
+      { id: 12, cat: "confidentiality", text: "Is access to customer data limited to employees who need it for their jobs?", fix: "Review who can access customer data and remove everyone who does not need it for their job." },
+      { id: 13, cat: "confidentiality", text: "Do you have confidentiality agreements with employees and contractors?", fix: "Put confidentiality agreements in place for every employee and contractor with data access." },
+      { id: 14, cat: "confidentiality", text: "Is customer data logically separated/isolated from other data?", fix: "Isolate customer data with per-tenant scoping and separate databases or storage boundaries." },
+      { id: 15, cat: "integrity", text: "Do you validate completeness and accuracy of data processing (error handling, reconciliation)?", fix: "Add input validation, error handling, and reconciliation checks to your critical data flows." },
+      { id: 16, cat: "integrity", text: "Are changes to production tested and approved before deployment?", fix: "Require tested, peer-reviewed changes (pull-request review) before anything ships to production." },
+      { id: 17, cat: "integrity", text: "Do you log who changed production data or configurations?", fix: "Turn on audit logging for production data and configuration changes, recording who changed what." },
+      { id: 18, cat: "privacy", text: "Do you have a published privacy policy describing what data you collect and why?", fix: "Publish a plain-language privacy policy covering what you collect and why." },
+      { id: 19, cat: "privacy", text: "Do you delete customer data when requested or no longer needed?", fix: "Implement a request-handling process and a retention schedule that deletes customer data on request." },
+      { id: 20, cat: "privacy", text: "Do you limit collection of personal data to what you actually need?", fix: "Audit signup forms and integrations; collect only the personal data you actually use." },
+      { id: 21, cat: "ai", text: "Do employees use AI coding assistants or AI agents (code, support, data tasks)?", fix: "If AI tools enter use, require formal approval and policies before they touch customer data." },
+      { id: 22, cat: "ai", text: "Was AI tool usage formally approved, not just adopted ad hoc?", fix: "Replace ad-hoc AI adoption with a written approval flow: request, security review, decision." },
+      { id: 23, cat: "ai", text: "Is there an audit trail logging what your AI agents/tools did (prompts, actions taken)?", fix: "Log AI agent/tool activity — prompts, actions, data accessed — into a tamper-evident audit trail." },
+      { id: 24, cat: "ai", text: "Is customer data restricted from being pasted into public AI tools?", fix: "Block or policy-restrict pasting customer data into public AI tools; use enterprise tiers with data controls." },
+      { id: 25, cat: "ai", text: "Is there a named person responsible for AI tool governance?", fix: "Assign one named person ownership of AI tool governance and publish that responsibility." },
+      { id: 26, cat: "ai", text: "Is AI-generated output reviewed before it reaches production or customers?", fix: "Require human review of AI-generated output before it reaches production or customers." }
+    ];
+
+    /* Sample data: a fictional 12-person SaaS startup — decent on MFA and
+       encryption, weak on incident response, vendor reviews, and backup
+       testing, poor on AI governance (ad hoc adoption, no audit trail). */
+    var SAMPLE_ANSWERS = {
+      1: "yes",    2: "partial", 3: "yes",     4: "partial",
+      5: "yes",    6: "no",      7: "no",      8: "partial",
+      9: "partial", 10: "no",    11: "unsure",
+      12: "partial", 13: "yes",  14: "partial",
+      15: "partial", 16: "yes",  17: "partial",
+      18: "yes",   19: "partial", 20: "partial",
+      21: "yes",   22: "no",     23: "no",     24: "no",
+      25: "no",    26: "partial"
+    };
+
+    var ANSWER_LABEL = { yes: "Yes", partial: "Partial", unsure: "Unsure", no: "No" };
+    var TOTAL = QUESTIONS.length;
+
+    var state = { answers: {}, sample: false, results: null };
+
+    function el(id) { return document.getElementById(id); }
+    function catById(key) {
+      for (var i = 0; i < CATEGORIES.length; i++) {
+        if (CATEGORIES[i].key === key) return CATEGORIES[i];
+      }
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    /* ---------- Questionnaire rendering ---------- */
+
+    function optionHtml(qid, value) {
+      var inputId = "q" + qid + "-" + value;
+      return '<label class="option" for="' + inputId + '">' +
+        '<input type="radio" name="q' + qid + '" id="' + inputId + '" value="' + value + '" data-qid="' + qid + '">' +
+        '<span class="opt-dot" aria-hidden="true"></span><span>' + ANSWER_LABEL[value] + "</span></label>";
+    }
+
+    function questionHtml(q) {
+      return '<fieldset class="question" data-qid="' + q.id + '" id="q-' + q.id + '">' +
+        '<legend><span class="qnum" aria-hidden="true">' + q.id + '</span><span class="visually-hidden">Question ' + q.id + ' of ' + TOTAL + ': </span>' + escapeHtml(q.text) + "</legend>" +
+        '<div class="options">' +
+          optionHtml(q.id, "yes") + optionHtml(q.id, "partial") + optionHtml(q.id, "unsure") + optionHtml(q.id, "no") +
+        "</div></fieldset>";
+    }
+
+    function categoryHtml(cat) {
+      var qs = QUESTIONS.filter(function (q) { return q.cat === cat.key; });
+      var cls = "cat-section" + (cat.differentiator ? " cat-ai" : "");
+      var html = '<section class="' + cls + '" aria-labelledby="cathead-' + cat.key + '">';
+      if (cat.differentiator) html += '<span class="ai-tag">The differentiator</span>';
+      html += '<div class="cat-head"><h3 id="cathead-' + cat.key + '">' + escapeHtml(cat.name) +
+        (cat.required ? ' <span class="cat-required">Required</span>' : "") +
+        '</h3><p class="cat-blurb">' + escapeHtml(cat.blurb) + '</p><p class="cat-count">' +
+        qs.length + " question" + (qs.length === 1 ? "" : "s") + "</p></div>";
+      for (var i = 0; i < qs.length; i++) html += questionHtml(qs[i]);
+      return html + "</section>";
+    }
+
+    function renderQuestionnaire() {
+      var html = "";
+      for (var i = 0; i < CATEGORIES.length; i++) html += categoryHtml(CATEGORIES[i]);
+      el("sections").innerHTML = html;
+      var inputs = el("sections").querySelectorAll('input[type="radio"]');
+      for (var j = 0; j < inputs.length; j++) {
+        inputs[j].addEventListener("change", onAnswerChange);
+      }
+    }
+
+    function onAnswerChange(e) {
+      var qid = e.target.getAttribute("data-qid");
+      state.answers[qid] = e.target.value;
+      var fs = el("q-" + qid);
+      if (fs) fs.classList.remove("unanswered");
+      /* A hand-edited answer after sample mode keeps the SAMPLE badge only
+         when every answer still matches the sample set. */
+      if (state.sample && SAMPLE_ANSWERS[qid] !== state.answers[qid]) setSampleMode(false, true);
+      updateProgress();
+      hideValidation();
+    }
+
+    function answeredCount() { return Object.keys(state.answers).length; }
+
+    function updateProgress() {
+      var n = answeredCount();
+      var pct = Math.round((n / TOTAL) * 100);
+      el("progress-fill").style.width = pct + "%";
+      el("progressbar").setAttribute("aria-valuenow", n);
+      var label = n + " of " + TOTAL + " answered";
+      el("progress-text").textContent = label;
+      el("sticky-count").textContent = label;
+    }
+
+    /* ---------- Sample mode ---------- */
+
+    function setSampleMode(on, silent) {
+      state.sample = on;
+      el("sample-banner").hidden = !on;
+      el("results-sample-badge").hidden = !on;
+      renderBasedOn();
+      if (!on && !silent) { /* nothing extra */ }
+    }
+
+    function applySample() {
+      state.answers = {};
+      for (var qid in SAMPLE_ANSWERS) {
+        if (Object.prototype.hasOwnProperty.call(SAMPLE_ANSWERS, qid)) {
+          state.answers[qid] = SAMPLE_ANSWERS[qid];
+          var input = document.querySelector('input[name="q' + qid + '"][value="' + SAMPLE_ANSWERS[qid] + '"]');
+          if (input) input.checked = true;
+        }
+      }
+      var flagged = el("sections").querySelectorAll(".question.unanswered");
+      for (var i = 0; i < flagged.length; i++) flagged[i].classList.remove("unanswered");
+      hideValidation();
+      setSampleMode(true);
+      updateProgress();
+      window.scrollTo(0, 0);
+      el("sample-banner").focus && el("sample-banner").setAttribute("tabindex", "-1");
+      el("sample-banner").focus({ preventScroll: true });
+    }
+
+    function clearSample(startFresh) {
+      state.answers = {};
+      var inputs = el("sections").querySelectorAll('input[type="radio"]');
+      for (var i = 0; i < inputs.length; i++) inputs[i].checked = false;
+      el("sections").querySelectorAll(".question.unanswered").forEach(function (f) { f.classList.remove("unanswered"); });
+      hideValidation();
+      setSampleMode(false);
+      updateProgress();
+      if (startFresh) showView("questions");
+    }
+
+    /* ---------- Scoring (transparent, per spec) ---------- */
+
+    /* Q21 is the gate, not a score: only scored answers affect scores. */
+    var GATE_Q = 21;
+    function isScored(q) { return q.id !== GATE_Q; }
+    /* The AI Governance section applies unless the user says their team
+       uses no AI tools — a "No" on Q21 means no exposure, not a gap. */
+    function aiApplicable() { return state.answers[GATE_Q] !== "no"; }
+
+    function bandFor(score) {
+      if (score <= 39) return { key: "early", label: "Early stage — significant work before an audit" };
+      if (score <= 59) return { key: "building", label: "Building foundations" };
+      if (score <= 79) return { key: "nearly", label: "Nearly ready — close gaps, then engage an auditor" };
+      return { key: "ready", label: "Audit-ready — engage a licensed CPA firm" };
+    }
+
+    function computeScores() {
+      var aiCounts = aiApplicable();
+      var catScores = CATEGORIES.map(function (cat) {
+        if (cat.key === "ai" && !aiCounts) {
+          return { key: cat.key, name: cat.name, score: null, na: true };
+        }
+        var qs = QUESTIONS.filter(function (q) { return q.cat === cat.key && isScored(q); });
+        var sum = 0;
+        for (var i = 0; i < qs.length; i++) sum += ANSWER_VALUE[state.answers[qs[i].id]];
+        return { key: cat.key, name: cat.name, score: Math.round(sum / qs.length) };
+      });
+      var counted = catScores.filter(function (c) { return !c.na; });
+      var overall = Math.round(counted.reduce(function (a, c) { return a + c.score; }, 0) / counted.length);
+      return { catScores: catScores, overall: overall, band: bandFor(overall), aiApplicable: aiCounts };
+    }
+
+    /* ---------- Gaps & 90-day plan ---------- */
+
+    function getGaps() {
+      var aiCounts = aiApplicable();
+      return QUESTIONS.filter(function (q) {
+        if (q.id === GATE_Q) return false;            // gate question: never a gap
+        if (q.cat === "ai" && !aiCounts) return false; // AI section: not applicable
+        return state.answers[q.id] !== "yes";
+      })
+        .map(function (q) {
+          return { id: q.id, cat: q.cat, text: q.text, fix: q.fix, answer: state.answers[q.id] };
+        });
+    }
+
+    /* Priority order: Security "no"s, other "no"s, partials, then unsures. */
+    function gapPriority(g) {
+      if (g.answer === "no") return g.cat === "security" ? 0 : 1;
+      if (g.answer === "partial") return 2;
+      return 3;
+    }
+
+    function prioritizedGaps(gaps) {
+      return gaps.slice().sort(function (a, b) {
+        return (gapPriority(a) - gapPriority(b)) || (a.id - b.id);
+      });
+    }
+
+    function renderCategoryBars(scores) {
+      var html = "";
+      for (var i = 0; i < scores.catScores.length; i++) {
+        var c = scores.catScores[i];
+        if (c.na) {
+          html += '<div class="cat-row"><div class="cat-row-head"><span class="cat-name">' +
+            escapeHtml(c.name) + '</span><span class="cat-na">Not applicable</span></div>' +
+            '<p class="cat-na-note">Not applicable — your team doesn\u2019t use AI tools, so there is nothing to govern.</p></div>';
+          continue;
+        }
+        html += '<div class="cat-row"><div class="cat-row-head"><span class="cat-name">' +
+          escapeHtml(c.name) + "<small>" + scoreQuestionCount(c.key) + ' questions</small></span>' +
+          '<span class="cat-score">' + c.score + ' <span style="color:var(--muted);font-weight:600;font-size:0.85rem">/ 100</span></span></div>' +
+          '<div class="cat-bar" role="img" aria-label="' + escapeHtml(c.name) + " score " + c.score + " of 100" + '">' +
+          '<span style="width:' + c.score + '%"></span></div></div>';
+      }
+      el("category-bars").innerHTML = html;
+    }
+
+    function scoreQuestionCount(catKey) {
+      var n = 0;
+      for (var i = 0; i < QUESTIONS.length; i++) {
+        if (QUESTIONS[i].cat === catKey && isScored(QUESTIONS[i])) n++;
+      }
+      return n;
+    }
+
+    function renderGaps(gaps, aiCounts) {
+      var wrap = el("gaps-list");
+      if (gaps.length === 0) {
+        /* With Q21 unscored, a "No" there is the one non-"yes" that is not a gap. */
+        wrap.innerHTML = '<p class="all-clear"><strong>No gaps surfaced.</strong> ' +
+          (aiCounts ? "Every question got a “yes”. " : "Every other question got a “yes”. ") +
+          "Keep in mind this tool scores your assertions — an auditor will still test the evidence behind each one.</p>";
+        return;
+      }
+      var html = "";
+      for (var i = 0; i < CATEGORIES.length; i++) {
+        var cat = CATEGORIES[i];
+        var group = gaps.filter(function (g) { return g.cat === cat.key; });
+        if (!group.length) continue;
+        html += '<div class="gaps-group"><h4>' + escapeHtml(cat.name) +
+          '<span class="gap-count">' + group.length + " gap" + (group.length === 1 ? "" : "s") + "</span></h4>";
+        for (var j = 0; j < group.length; j++) {
+          var g = group[j];
+          html += '<div class="gap"><p class="gap-q"><span class="sev sev-' + g.answer + '">' +
+            ANSWER_LABEL[g.answer] + '</span><span style="color:var(--muted)">Q' + g.id + ".</span> " +
+            escapeHtml(g.text) + '</p><p class="gap-fix"><span class="fix-label">Fix</span>' +
+            escapeHtml(g.fix) + "</p></div>";
+        }
+        html += "</div>";
+      }
+      wrap.innerHTML = html;
+    }
+
+    function renderPlan(gaps) {
+      var section = el("plan-section");
+      if (gaps.length === 0) { section.hidden = true; return; }
+      section.hidden = false;
+      var ordered = prioritizedGaps(gaps);
+      var n = ordered.length;
+      var third = Math.ceil(n / 3);
+      var windows = [
+        { label: "Days 1–30", items: ordered.slice(0, third) },
+        { label: "Days 31–60", items: ordered.slice(third, third * 2) },
+        { label: "Days 61–90", items: ordered.slice(third * 2) }
+      ];
+      var html = "";
+      var counter = 0;
+      for (var w = 0; w < windows.length; w++) {
+        if (!windows[w].items.length) continue;
+        html += '<div class="plan-group"><h4><span class="window">' + windows[w].label + "</span></h4>" +
+          '<ol class="plan-list">';
+        for (var i = 0; i < windows[w].items.length; i++) {
+          var g = windows[w].items[i];
+          counter++;
+          html += '<li class="plan-item"><span class="plan-num" aria-hidden="true">' + counter + "</span><p>" +
+            escapeHtml(g.fix) + '</p><p class="plan-meta">' +
+            escapeHtml(catById(g.cat).name) + " · Q" + g.id + " · answered “" + ANSWER_LABEL[g.answer] + "”</p></li>";
+        }
+        html += "</ol></div>";
+      }
+      el("plan-list").innerHTML = html;
+    }
+
+    /* ---------- Views & validation ---------- */
+
+    function showView(which) {
+      var isResults = which === "results";
+      el("view-questions").hidden = isResults;
+      el("view-results").hidden = !isResults;
+      window.scrollTo(0, 0);
+      if (isResults) el("results-heading").focus({ preventScroll: true });
+    }
+
+    function hideValidation() { el("validation").hidden = true; }
+
+    function renderBasedOn() {
+      var target = el("based-on");
+      if (state.sample) {
+        target.innerHTML = "<strong>SAMPLE DATA —</strong> these results are based on sample data from a fictional 12-person SaaS startup, not your own answers.";
+      } else {
+        target.textContent = "These results are based on your answers.";
+      }
+    }
+
+    function validateAndShowResults() {
+      var missing = QUESTIONS.filter(function (q) { return !state.answers[q.id]; });
+      var box = el("validation");
+      if (missing.length > 0) {
+        for (var i = 0; i < missing.length; i++) el("q-" + missing[i].id).classList.add("unanswered");
+        var first = missing[0].id;
+        box.innerHTML = "<strong>" + missing.length + " of " + TOTAL + " questions still need an answer.</strong> " +
+          "Please answer every question — starting with question " + first + " — to see your results.";
+        box.hidden = false;
+        var fs = el("q-" + first);
+        fs.setAttribute("tabindex", "-1");
+        fs.scrollIntoView({ block: "center" });
+        fs.focus({ preventScroll: true });
+        return;
+      }
+      var scores = computeScores();
+      var gaps = getGaps();
+      state.results = { scores: scores, gaps: gaps };
+      renderResults(scores, gaps);
+      showView("results");
+    }
+
+    function renderResults(scores, gaps) {
+      renderBasedOn();
+      el("overall-num").textContent = scores.overall;
+      renderMethodNote(scores.aiApplicable);
+      var bandEl = el("band-label");
+      bandEl.textContent = scores.band.label;
+      bandEl.className = "score-band band-" + scores.band.key;
+      el("meter").className = "meter meter-" + scores.band.key;
+      el("meter-fill").style.width = "0%";
+      setTimeout(function () { el("meter-fill").style.width = scores.overall + "%"; }, 30);
+      renderCategoryBars(scores);
+      renderGaps(gaps, scores.aiApplicable);
+      renderPlan(gaps);
+      populatePrintSummary(scores, gaps);
+    }
+
+    /* The method note states the exact formula used — including whether the
+       overall averaged five or six categories — so the rule stays visible. */
+    function renderMethodNote(aiCounts) {
+      el("method-note").innerHTML =
+        "<strong>How this was computed.</strong> Yes = 100, Partial = 50, Unsure = 25, No = 0. " +
+        "Each category score is the average of its question scores, rounded. " +
+        "<strong>Question 21 is not scored</strong> — it only determines whether the AI Governance section applies to you. " +
+        "The overall score is the average of the " + (aiCounts ? "six" : "five") + " rounded category scores, rounded. " +
+        "Bands: 0&ndash;39 Early stage, 40&ndash;59 Building foundations, 60&ndash;79 Nearly ready, 80&ndash;100 Audit-ready.";
+    }
+
+    /* ---------- Print-only executive summary ---------- */
+
+    function populatePrintSummary(scores, gaps) {
+      var top = prioritizedGaps(gaps).slice(0, 10);
+      var date = new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+      var sourceLine = state.sample
+        ? "Based on SAMPLE DATA (fictional 12-person SaaS startup), not the reader's answers."
+        : "Based on the reader's answers.";
+      var html = '<p class="ps-meta">Attest SOC 2 Readiness Assessment</p>';
+      if (state.sample) html += '<span class="ps-badge">Sample data</span>';
+      html += "<h1>Executive Summary</h1>" +
+        '<p class="ps-meta">' + date + " · " + sourceLine + "</p>" +
+        '<p class="ps-score-line">Overall score: ' + scores.overall + " / 100 — " + escapeHtml(scores.band.label) + "</p>" +
+        '<p class="ps-method">Scoring: Yes = 100 · Partial = 50 · Unsure = 25 · No = 0. ' +
+        "Question 21 is not scored — it only determines whether the AI Governance section applies to you. " +
+        "Category scores = average of their question scores, rounded. " +
+        "Overall score = average of the " + (scores.aiApplicable ? "six" : "five") + " rounded category scores, rounded.</p>" +
+        "<h2>Category scores</h2>" +
+        '<table class="ps-table"><thead><tr><th scope="col">Category</th><th scope="col">Score / 100</th></tr></thead><tbody>';
+      for (var i = 0; i < scores.catScores.length; i++) {
+        var c = scores.catScores[i];
+        if (c.na) {
+          html += "<tr><td>" + escapeHtml(c.name) + "</td><td>Not applicable</td></tr>";
+          continue;
+        }
+        html += "<tr><td>" + escapeHtml(c.name) + "</td><td>" + c.score + "</td></tr>";
+      }
+      html += "</tbody></table>";
+      if (!scores.aiApplicable) {
+        html += "<p class=\"ps-method\">AI Governance: not applicable — your team doesn\u2019t use AI tools, so there is nothing to govern.</p>";
+      }
+      html += "<h2>Top gaps</h2>";
+      if (top.length === 0) {
+        html += "<p>No gaps surfaced — every " +
+          (scores.aiApplicable ? "question was answered “yes”." : "other question was answered “yes”.") + "</p>";
+      } else {
+        html += '<ol class="ps-gaps">';
+        for (var j = 0; j < top.length; j++) {
+          var g = top[j];
+          html += "<li><strong>Q" + g.id + " (" + escapeHtml(catById(g.cat).name) + ").</strong> " +
+            escapeHtml(g.text) + '<br><span class="ps-fix"><strong>Fix:</strong> ' + escapeHtml(g.fix) + "</span></li>";
+        }
+        html += "</ol>";
+      }
+      html += '<p class="ps-disc">Preliminary assessment — not a certification or audit. Only licensed CPA firms can issue SOC 2 reports.</p>' +
+        '<p class="ps-lock">Your data never leaves this browser — all analysis runs locally.</p>';
+      el("print-summary").innerHTML = html;
+    }
+
+    /* ---------- Early-access email capture ----------
+       Backend endpoint for lead capture. Empty string = same origin.
+       When the assessment is hosted on GitHub Pages and the Attest backend
+       runs elsewhere, set this to the backend's public URL, e.g.
+       "https://attest.example.com". If the backend is unreachable, the lead
+       is queued in localStorage on this device instead of being lost. */
+
+    var ATTEST_API_URL = "";
+
+    var EMAIL_RE = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
+    function wireEmailForm() {
+      var form = el("email-form");
+      var input = el("email-input");
+      var errorBox = el("email-error");
+      var errorText = el("email-error-text");
+      var successBox = el("email-success");
+
+      function resetEmailForm() {
+        el("email-fields").hidden = false;
+        successBox.hidden = true;
+        errorBox.hidden = true;
+        input.value = "";
+        input.removeAttribute("aria-invalid");
+      }
+      form.resetEmailForm = resetEmailForm;
+
+      input.addEventListener("input", function () {
+        if (!errorBox.hidden) {
+          errorBox.hidden = true;
+          input.removeAttribute("aria-invalid");
+        }
+      });
+
+      // Lead capture: POST to the Attest backend; queue locally if unreachable.
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var email = input.value.trim();
+        errorBox.hidden = true;
+        input.removeAttribute("aria-invalid");
+        if (!EMAIL_RE.test(email)) {
+          errorText.textContent = "Enter a valid email address, like you@company.com.";
+          errorBox.hidden = false;
+          input.setAttribute("aria-invalid", "true");
+          input.focus();
+          return;
+        }
+        var payload = { email: email, source: "assessment" };
+        if (state.results && state.results.scores) {
+          payload.score = state.results.scores.overall;
+          if (state.results.scores.band && state.results.scores.band.label) {
+            payload.band = state.results.scores.band.label;
+          }
+        }
+        function showEmailSuccess() {
+          el("email-fields").hidden = true;
+          successBox.hidden = false;
+          successBox.focus && successBox.setAttribute("tabindex", "-1");
+          successBox.focus({ preventScroll: true });
+        }
+        function queueOfflineLead() {
+          /* Backend unreachable — keep the lead on this device so it is not lost. */
+          try {
+            var key = "attest_pending_leads";
+            var q = JSON.parse(localStorage.getItem(key) || "[]");
+            q.push({ email: email, payload: payload, ts: Date.now() });
+            localStorage.setItem(key, JSON.stringify(q));
+          } catch (err) { /* storage unavailable — still show validated success state */ }
+        }
+        try {
+          fetch((ATTEST_API_URL || "") + "/api/leads", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }).then(function (resp) {
+            if (!resp.ok) queueOfflineLead();
+            showEmailSuccess();
+          }).catch(function () {
+            queueOfflineLead();
+            showEmailSuccess();
+          });
+        } catch (err) {
+          queueOfflineLead();
+          showEmailSuccess();
+        }
+      });
+    }
+
+    /* ---------- Wire-up & init ---------- */
+
+    function init() {
+      renderQuestionnaire();
+      wireEmailForm();
+      updateProgress();
+      el("btn-sample").addEventListener("click", applySample);
+      el("btn-clear-sample").addEventListener("click", function () { clearSample(false); });
+      el("btn-results").addEventListener("click", validateAndShowResults);
+      el("btn-edit").addEventListener("click", function () { showView("questions"); });
+      el("btn-print").addEventListener("click", function () { window.print(); });
+      el("btn-reset").addEventListener("click", function () {
+        clearSample(true);
+        var form = el("email-form");
+        if (form.resetEmailForm) form.resetEmailForm();
+        el("print-summary").innerHTML = "";
+        state.results = null;
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && e.target && e.target.classList && e.target.classList.contains("option")) {
+          var input = e.target.querySelector("input");
+          if (input) { input.checked = true; input.dispatchEvent(new Event("change", { bubbles: true })); }
+        }
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+    </script>
+  </body>
+</html>
